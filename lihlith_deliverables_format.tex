@@ -1,0 +1,140 @@
+\documentclass{lihlith}
+\usepackage[utf8]{inputenc} % utf8 encoding
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+ 
+\usepackage{amsthm}
+
+\setlength{\headheight}{15.2pt}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+ 
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+%%%%%%% Don't touch the following lines
+\newcommand {\deltitle}{\centering \LARGE {\textbf{\Title}}}
+\DocTitle{\ShortTitle}
+\DocNumber{{\WorkpackageNum}-{\DeliverableNum}}
+\DocDate{\Date}
+\DocVersion{\Version}
+%%%%%%% 
+%%%%%%% 
+
+
+%% Warning: use 'pdflatex' command to compile this file.
+
+%% Put here the title of the deliverable
+\def\Title{Long Title}
+
+%% The ``short'' title of the deliverable (in the case that \Title is too long)
+%% This will be put in the header of the document. Let it be \Title in the case
+%% is short enough
+\def\ShortTitle{Short title}
+
+%% Put here the authors
+\def\Authors{Author1$^1$, Author2$^2$}
+
+%% Put here the affiliation
+\def\Affiliation{(1) UPV/EHU, (2) ...}
+
+%% The date
+\def\Date{DATE}
+
+%% The Delivery Date
+\def\DeliveryDate{December 2018}
+
+%% The workpackage number 
+\def\WorkpackageNum{WPX}
+
+%% The workpackage responsible
+\def\WPresponsible{The WP responsible}
+
+%% The deliverable number (e.g. D2.1)
+\def\DeliverableNumShort{D1.2}
+\def\DeliverableNum{Deliverable \DeliverableNumShort}
+
+%% The version of the document (e.g. DRAFT, FINAL,...)
+\def\Version{FINAL}
+
+%% Availability (Public / FP7 / IST / Project Internal)
+\def\Availability{Public}
+
+%% Type (report / prototype / software / ontology / wordnets /etc.)
+
+\def\Type{Report}
+
+%% Keywords
+\def\Keywords{Keyword1, Keyword2}
+
+%% Abstract
+\def\Abstract{Here comes the Abstract.}
+
+\begin{document}
+\input{cover.tex}
+
+%% Revisions
+\cleardoublepage
+\begin{nwrrevisions}
+ \nwrrevision{0.1}{Sep 2, 2018}{An example document}{Author 1}{}
+ \nwrrevision{0.2}{Oct 3, 2018}{Started with black document and created}{Author 2}{}
+ \nwrrevision{}{}{}{}{}
+ \nwrrevision{}{}{}{}{}
+ \nwrrevision{x.0}{date}{approval by project manager}{who}{-}
+\end{nwrrevisions}
+
+%% Excecutive Summary
+\cleardoublepage
+\section*{Executive Summary}
+
+executive summary text....
+
+
+%% TOC, tables
+\cleardoublepage
+\tableofcontents
+\cleardoublepage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% Here starts the deliverable content.
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+\label{sec:introduction}
+
+Life Long Learning is defined by \cite{chen2016lifelong} as follows: 
+
+\theoremstyle{definition}
+\begin{definition}{Lifelong machine learning (LML)} is a continuous learning process. Given that the learner has learned $N$ tasks. When faced with the $(N+1)$th task the learner leverages past knowledge to help learn the new task. The goal is to optimize on both the new task and the previous tasks. The three components are: contiuous learning, knowledge accumulation and maintenance and leverage past knowledge to learn new tasks. 
+\end{definition}
+This definition is quite general and can be applied broadly to different scenarios. In this work, we focus on the application of the definition on dialogue systems. Based on this, we derive a general evaluation framework, which can be applied to dialogue systems in the life long learning setting. 
+
+
+\section{Life Long Learning for Dialogue Systems}
+\label{sec:lll4ds}
+\subsection{Apply the Definition}
+There are different types of dialogue systems: task-oriented systems, conversational agents and question answering systems. 
+There are several components to life long learning, which need to be applied to dialogue systems. 
+\paragraph{Tasks} refer to the capabilities of the dialogue system. There are different dimensions (i) new skills to learn, e.g. talking about the weather or ordering a new item. (ii) learn a new domain, e.g. learn to talk about hotels when trained on restaurants. 
+\paragraph{Continuous learning} in the case of dialogue systems, the learning is done thought interaction with its users. Over time large amounts of dialogues get stored, from which new skills can be learned. Furthermore, implicit and explicit feedback from the users can be used to improve the dialogue system. Moreover, the dialogue system can recognize requests, which it cannot successfully complete yet. 
+\paragraph{Knowledge accumulation and maintenance} depends strongly on the dialogue system. One source of accumulated knowledge are the past dialogues, these can be used to improve the dialogue system. Another form of knowledge accumulation is in the form of facts: extract new facts from conversations and expand an existing knowledge base. 
+\paragraph{Leverage past knowledge to learn new tasks}  
+\subsection{Examples}
+
+Put Xaomei here and put Madzumer et al here.
+
+
+\clearpage
+\addcontentsline{toc}{section}{References}
+\bibliographystyle{named}
+\bibliography{lihlith_deliverables_format} % Put here the name of BibTeX file
+
+\end{document}
