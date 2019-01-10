@@ -115,21 +115,37 @@ Life Long Learning is defined by \cite{chen2016lifelong} as follows:
 \theoremstyle{definition}
 \begin{definition}{Lifelong machine learning (LML)} is a continuous learning process. Given that the learner has learned $N$ tasks. When faced with the $(N+1)$th task the learner leverages past knowledge to help learn the new task. The goal is to optimize on both the new task and the previous tasks. The three components are: contiuous learning, knowledge accumulation and maintenance and leverage past knowledge to learn new tasks. 
 \end{definition}
+There are some additional considerations to be made considering the above definition. 
+\begin{itemize}
+\item The learner learns new tasks continuously, however, in contrast to transfer-learning, the learner improves or at least does not deteriorate its performance on the old tasks. Ideally, by learning new tasks, the performance on the previous tasks improves. 
+\item The learner is not restricted to a certain task or domain. On the contrary, the learner is encouraged to learn different types of tasks (e.g. sentiment analysis, named entity recognition, etc) and domains. 
+\item Ideally, the learner is \emph{self-motivated} and able to find its own learning tasks and data by interacting with the environment. 
+\end{itemize}
+
 This definition is quite general and can be applied broadly to different scenarios. In this work, we focus on the application of the definition on dialogue systems. Based on this, we derive a general evaluation framework, which can be applied to dialogue systems in the life long learning setting. 
 
 
 \section{Life Long Learning for Dialogue Systems}
 \label{sec:lll4ds}
-\subsection{Apply the Definition}
-There are different types of dialogue systems: task-oriented systems, conversational agents and question answering systems. 
-There are several components to life long learning, which need to be applied to dialogue systems. 
-\paragraph{Tasks} refer to the capabilities of the dialogue system. There are different dimensions (i) new skills to learn, e.g. talking about the weather or ordering a new item. (ii) learn a new domain, e.g. learn to talk about hotels when trained on restaurants. 
-\paragraph{Continuous learning} in the case of dialogue systems, the learning is done thought interaction with its users. Over time large amounts of dialogues get stored, from which new skills can be learned. Furthermore, implicit and explicit feedback from the users can be used to improve the dialogue system. Moreover, the dialogue system can recognize requests, which it cannot successfully complete yet. 
-\paragraph{Knowledge accumulation and maintenance} depends strongly on the dialogue system. One source of accumulated knowledge are the past dialogues, these can be used to improve the dialogue system. Another form of knowledge accumulation is in the form of facts: extract new facts from conversations and expand an existing knowledge base. 
-\paragraph{Leverage past knowledge to learn new tasks}  
-\subsection{Examples}
+There are different types of dialogue systems: task-oriented systems, conversational agents and question answering systems. In the context of the LIHLITH project, we focus on the question answering type dialogue systems (QADS). This means, a dialogue system, which is trained to satisfy the information needs of its users. This may range from single-turn question-answering to complex dialogues spanning over several turns. 
+There are several components to life long learning, which need to be applied to (QADS). 
+\paragraph{Tasks.} In the case of QADS, tasks are the questions a the system is faced with. New tasks might include questions about entities or relations, which the system has never encountered before, it might include learning about different domains. Furthermore, tasks could also refer to the complexities of the questions asked. For instance, if all previous questions were simple factoid question answering questions, the system learned to employ a certain strategy for these questions. If the system is faced with more complex questions, it might has to learn new strategies to answer these questions. 
+\paragraph{Continuous Learning.} Continuous learning is performed by interactions with the users. This involves to find questions that the system could not answer in a satisfactory fashion. For instance, if a user asks a question about an unknown entity, then the system can learn about this entity and its relations to other entities \cite{mazumder2018towards}. This part requires the dialogue system to self reflect and trigger the learning when it sees, that it cannot answer a question.
+\paragraph{Knowledge accumulation and maintenance.} The knowledge of QA systems has different aspects: factoid knowledge in the form of knowledge graphs, unstructured knowledge in the form of texts or text-snippets and the strategy used to retrieve this knowledge. The knowledge accumulation is closely tied to the continuous learning. During the conversation the learner expands its knowledge base.
+\paragraph{Leverage past knowledge.} When faced with a new task (e.g. an unknown entity, a unseen type of question) the QADS relies on past interactions to learn how to solve the new task. For instance, when faced with a new entity the learned needs to integrate it to the existing KB. For this, the learned can access past experiences of integrating new entities to the KB.   
 
-Put Xaomei here and put Madzumer et al here.
+\section{On the Evaluation of Life Long Learning for QADS}
+In order to evaluate a life long learning system several considerations have to be made. \cite{chen2016lifelong} propose the following high-level evaluation procedure for lifelong learning systems: 
+\begin{itemize}
+\item Run the data from the previous task in order to setup the KB.
+\item Run the data on the new task. 
+\item Run baseline algorithms. The baselines can be algorithms trained in isolation specifically on the task or other lifelong learning systems. 
+\item Compare the results from the lifelong learning system to the baselines. 
+\end{itemize}
+The authors state some additional considerations, which have to be kept in mind.
+\begin{itemize}
+\item The number of tasks might need to be large in order to see a significant effect on the performance. 
+\end{itemize}
 
 
 \clearpage
