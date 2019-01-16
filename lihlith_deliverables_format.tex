@@ -105,14 +105,41 @@ executive summary text....
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\abstract{Lifelong learning is the ability of a software system to adapt to new situations during its lifetime. We explore how this paradigm can be applied to dialogue systems, how it might be implemented, and how we can evaluate the lifelong learning progress.}
+
+
+
 \section{Introduction}
-\label{sec:introduction}
+\label{sec:intro}
+Chatbots, dialogue systems, conversational user interfaces - the names may differ, but the basic idea is the same: "intelligent" computer systems that can interact with humans in natural language. These systems have become more and more popular in the past years, and there is an increasing interest in spoken and written dialogue systems in research and industry. Prominent examples include automatic customer support agents, smart home devices such as Amazon Alexa or Apple's Siri, and in-car operating systems. 
+While implementing a successful and reliable dialogue systems is already a challenge, "lifelong learning" even adds an additional twist: the system should be able to adapt to new situations during its lifetime. More precisely, the dialogue system learns to handle new situations by interacting with its environment (e.g. asking a domain expert, scraping the web), instead of being retrained by a machine learning expert. For instance, a chatbot for travel advice might be confronted with a new location that is not yet in its knowledge base. One strategy to deal with this situation could b to ask the user to give additional information (e.g. in which country, GPS coordinates etc.), then explore the web to find information about the location (e.g. databases, Wikipedia or travel reviews), and finally analyze, structure, and integrate the information into the chatbots' knowledge base. 
 
-Life Long Learning is defined by \cite{chen2016lifelong} as follows: 
+In this paper, we attempt to make a step forward towards understanding what lifelong learning in the context of dialogue systems means. In order to achieve this, we first briefly introduce both concepts independently and discuss typical settings and applications. Then we describe the the impact of applying lifelong learning to dialogue system (in Section \ref{sec:LL4DS}). Finally, we turn to the important question how we could measure the success (or failure) of lifelong learning in the context of dialogue systems (Section \ref{sec:evaluation}). 
 
-\theoremstyle{definition}
-\begin{definition}{Lifelong machine learning (LML)} is a continuous learning process. Given that the learner has learned $N$ tasks. When faced with the $(N+1)$th task the learner leverages past knowledge to help learn the new task. The goal is to optimize on both the new task and the previous tasks. The three components are: contiuous learning, knowledge accumulation and maintenance and leverage past knowledge to learn new tasks. 
-\end{definition}
+
+\section{What is a Dialogue System?} 
+In the following, we introduce the concept of a dialogue system. \emph{A dialogue system allows the user to converse with a computer system using natural language}. Such systems can be applied to a variety of tasks, e.g.:
+\begin{itemize}
+\item \emph{Virtual Assistants}, which are developed to aid its users in every-day tasks, such as scheduling appointments. They usually operate on predefined actions, which can be triggered by voice command. 
+\item \emph{Interaction with Information Systems}, by asking questions or finding a piece of information (e.g. the most suitable hotel in town).
+\item \emph{Training environments}, where the dialogue systems are developed to train students in the interaction with medical patients or train military personnel in questioning a witness.
+\item \emph{Answering Questions}, where the dialogue system can answer specific questions of a user. These might be factoid questions or more complex questions. 
+\end{itemize}
+
+Dialogue systems usually structure dialogues in \emph{turns}, each turn is defined by one or more \emph{utterances} from one speaker. Two consecutive turns between two different speakers is called an \emph{exchange}. Multiple exchanges constitute a \emph{dialogue}. Another correlated view, is to interpret each turn or each utterance as an action (more on this later). The main component of a dialogue system is the dialogue strategy, which defines the content of the next utterance and thus the behaviour of the dialogue system. There are many different approaches to design a dialogue strategy, which are partly dictated by the application of the dialogue system. However, there are three broad classes of dialogue systems, which we encounter in the literature: task-oriented systems, conversational agents and interactive question answering systems\footnote{In recent literature, the distinction is made only between the first two classes of dialogue systems \cite{serban2015survey,Chen:2017:SDS:3166054.3166058,jura2017speech_dial}. However, interactive question answering systems cannot be completely placed in either of the two categories. }. We identified the following characteristic features, which help differentiate between the three different classes: is the system developed to solve a task, does the dialogue follow a structure, is the domain restricted or is it open domain, does the dialogue span over multiple turns, are the dialogues rather long or efficient, who takes the initiative, and what is the interface used (text, speech, multi-modal).
+\begin{itemize}
+\item \emph{Task-oriented systems} are developed to help the user solve a specific task as efficiently as possible. The dialogues are characterized by following a clearly defined structure, which is derived from the domain. The dialogues follow mixed initiative: both, the user and the system can take the lead. Usually, the systems found in the literature are built for speech input and output. However, task-oriented systems in the domain of assistance are built on multi-modal input and output. 
+\item \emph{Conversational agents} display a more unstructured conversation, as their purpose is to have open-domain dialogues with no specific task to solve. Most of these systems are built to emulate social interactions and thus longer dialogues are desired.
+\item \emph{Question Answering (QA) systems} are built for the specific task of answering questions. The dialogues are not defined by a structure as with task-oriented systems, however they mostly follow the question and answer style pattern. QA systems may be built for a specific domain, but also be tilted towards more open domain questions. Usually, the domain is dictated by the underlying data, e.g. knowledge bases or text snippets from forums. Traditional QA systems work on a singe-turn interaction, however, there exist systems that allow multiple turns to cover follow-up questions. The initiative is mostly done by the user who asks questions. 
+\end{itemize}
+
+%For a more elaborate discussion of dialogue systems, see for instance the survey paper by \todo{authors} \ref{TODO_Survey_DS}.  \todo{add reference to our survey paper, or add it in section Evaluation}
+
+
+\section{What is Lifelong Learning?}
+In the most abstract way, \emph{Lifelong Learning (\LLL) is the ability of a system to use past experiences to adapt to future challenge}. There exist various definitions of \LLL in the literature, for instance in \ref{todo, todo2, todo3}. For the purpose of this paper, we exploit the definition of \LLL from Chen and Liu~\cite{Chen:2016:LML:3086758}, which we summarize in the following: 
+
+Lifelong learning is a continuous learning process. Given that the learner has learned $N$ tasks. When faced with the $(N+1)$th task the learner leverages past knowledge to help learn the new task. The goal is to optimize on both the new task and the previous tasks. The three components are: continuous learning, knowledge accumulation and maintenance and leverage past knowledge to learn new tasks. 
 There are some additional considerations to be made considering the above definition. 
 \begin{itemize}
 \item The learner learns new tasks continuously, however, in contrast to transfer-learning, the learner improves or at least does not deteriorate its performance on the old tasks. Ideally, by learning new tasks, the performance on the previous tasks improves. 
@@ -120,31 +147,75 @@ There are some additional considerations to be made considering the above defini
 \item Ideally, the learner is \emph{self-motivated} and able to find its own learning tasks and data by interacting with the environment. 
 \end{itemize}
 
-This definition is quite general and can be applied broadly to different scenarios. In this work, we focus on the application of the definition on dialogue systems. Based on this, we derive a general evaluation framework, which can be applied to dialogue systems in the life long learning setting. 
+Note that this definition is strongly focused on "knowledge improvement", whereas in the setting of \LLL for dialogue systems, there are also other goals, as we discuss in the following section. In addition, we would like to mention that the concept of a "task" may cover situations of varying complexity, ranging from single new instances (e.g. a new person in a face recognition system) up to new domains (e.g. switching from cooking to car tuning for a questions answering systems). Finally, note that several other terms have been coined and used for very similar learning paradigms of systems that improve over time, such as continuous learning \cite{goodfellow2013empirical,parisi2018continual}, meta-learning \cite{vilalta2002perspective}, active learning \cite{settles2012active}, or transfer learning \cite{Pan:2010:STL:1850483.1850545}. For a more elaborate introduction of \LLL, see the recent book by Chen and Liu~\cite{Chen:2016:LML:3086758}, which gives a good overview of \LLL in general and describes applications in various fields. 
 
 
-\section{Life Long Learning for Dialogue Systems}
-\label{sec:lll4ds}
-There are different types of dialogue systems: task-oriented systems, conversational agents and question answering systems. In the context of the LIHLITH project, we focus on the question answering type dialogue systems (QADS). This means, a dialogue system, which is trained to satisfy the information needs of its users. This may range from single-turn question-answering to complex dialogues spanning over several turns. 
-There are several components to life long learning, which need to be applied to (QADS). 
-\paragraph{Tasks.} In the case of QADS, tasks are the questions a the system is faced with. New tasks might include questions about entities or relations, which the system has never encountered before, it might include learning about different domains. Furthermore, tasks could also refer to the complexities of the questions asked. For instance, if all previous questions were simple factoid question answering questions, the system learned to employ a certain strategy for these questions. If the system is faced with more complex questions, it might has to learn new strategies to answer these questions. 
-\paragraph{Continuous Learning.} Continuous learning is performed by interactions with the users. This involves to find questions that the system could not answer in a satisfactory fashion. For instance, if a user asks a question about an unknown entity, then the system can learn about this entity and its relations to other entities \cite{mazumder2018towards}. This part requires the dialogue system to self reflect and trigger the learning when it sees, that it cannot answer a question.
-\paragraph{Knowledge accumulation and maintenance.} The knowledge of QA systems has different aspects: factoid knowledge in the form of knowledge graphs, unstructured knowledge in the form of texts or text-snippets and the strategy used to retrieve this knowledge. The knowledge accumulation is closely tied to the continuous learning. During the conversation the learner expands its knowledge base.
-\paragraph{Leverage past knowledge.} When faced with a new task (e.g. an unknown entity, a unseen type of question) the QADS relies on past interactions to learn how to solve the new task. For instance, when faced with a new entity the learned needs to integrate it to the existing KB. For this, the learned can access past experiences of integrating new entities to the KB.   
 
-\section{On the Evaluation of Life Long Learning for QADS}
-In order to evaluate a life long learning system several considerations have to be made. \cite{chen2016lifelong} propose the following high-level evaluation procedure for lifelong learning systems: 
+\section{Lifelong Learning for Dialogue Systems}
+\label{sec:LL4DS}
+%\todo{The definition of \LLL by Chen and Liu focuses on learning “knowledge”, which in a sense is a paraphrase for “anything a system needs to accomplish its goals”. In the case of dialogue systems, we suggest to ere is another aspect which has - to our knowledge, not yet been covered nor discussed: the “dialogue quality”. 
+%incorporate that dialogue systems are in a way "special" since the user can give immediate feedback on the success of a dialogue, how satisfied he/she is, and even answer questions of the system or even EXPLAIN why something is good/bad and also describe procedures for the system to follow
+%}
+While the definition of lifelong learning given by \cite{Chen:2016:LML:3086758} is very general, we attempt not to apply the definition to dialogue systems. These systems allow its users to converse with a computer via natural language. This implies a high level of interactivity. Thus, the focus of applying \LLL to dialogue systems should lie in the interactive nature of the dialogue. Furthermore, \LLL describes the capability of the dialogue system to learn to handle new situations throughout its deployment, i.e. without being re-trained by a machine-learning expert. Ideally, the learning takes place in a self-driven and autonomous manner. This does not exclude (it rather encourages) the assistance of a "domain expert", i.e. a type of user who takes the role of a teacher. 
+
+We assume that the dialogue system is an agent that interacts with its environment. The environment includes humans as well as having access to structured and unstructured knowledge sources (e.g. knowledge bases, Wikipedia, Twitter).
+When faced with a new situation, the dialogue system has to learn how to handle this new situation. This does not necessarily means that the dialogue system directly adapts to the new situations. Rather, through interaction with its environment, the dialogue system learns to handle the situations over time. 
+
+There are various aspects to a dialogue system which can be improved over time:
 \begin{itemize}
-\item Run the data from the previous task in order to setup the KB.
-\item Run the data on the new task. 
-\item Run baseline algorithms. The baselines can be algorithms trained in isolation specifically on the task or other lifelong learning systems. 
-\item Compare the results from the lifelong learning system to the baselines. 
-\end{itemize}
-The authors state some additional considerations, which have to be kept in mind.
-\begin{itemize}
-\item The number of tasks might need to be large in order to see a significant effect on the performance. 
+    \item \emph{Language Understanding}: Here, the dialogue systems' capability of parsing the user input is the focal point. This is the case, for instance, when new request types occur over time, for instance if a system was only faced with simple factual questions until now, and the system is suddenly confronted with complex questions. 
+    \item \emph{Dialogue Behaviour} is concerned with the "soft" quality factors of a dialogue, such as human-likeness, appropriateness of responses, efficiency of reaching a goal, engaging utterances etc. Typically, the DS asks after a user interaction for feedback, which is then used to improve the behaviour over time. Thus, the DS leverages past experiences to improve its future behaviour. Note that in this case, there are no external catalysts that trigger \LLL, but there is an "intrinsic motivation" of the system itself. 
+    \item \emph{Knowledge Induction} is concerned with accumulating more information. This means adapting the knowledge base (KB) with new or updated knowledge, which can be factual knowledge or unstructured. Here, new situations are in the context of handling new entities and relations which are not in the current knowledge base. 
+    \item \emph{Capability Improvement} is concerned with extending the functionality of the DS. This can range from domain adaption (e.g. moving from asian recipies to the pasta domain) up to integrating new skills (e.g. reporting weather forecasts for a personal assistant) 
 \end{itemize}
 
+In each case the dialogue system needs to improve its aspects over time. Each time it is faced with a new situation one or more of the aforementioned aspects need to be adapted.
+In the context of dialogue systems, this adoption can be done by means of interacting with a "domain" expert. More precisely, the goal is to remove the need to rely on a dialogue system expert who would retrain the different components of the dialogue system. Rather the domain-expert teaches the dialogue system how to handle a new situation through interaction. Note that in some cases the system may be able to learn how to handle the situation autonomously, especially in the case where it can aggregate data from some external sources. 
+Thus, a \LLL enhanced dialogue system is able to learn to adapt to new situations by interacting with its environment and not by means of retraining components. 
+
+\section{Evaluation of Lifelong Learning for Dialogue Systems}
+\label{sec:evaluation}
+The above definition of \LLL for dialogue systems sets a strong focus on learning to handle new situations by interacting with its environment. Thus, the \LLL component of the dialogue system needs to be trained and evaluated with this in mind. More precisely, the interaction with an environment lies at the centre of the training and evaluation. The environment should enable the interaction the dialogue system will encounter during deployment. This includes the interaction with a domain expert. 
+
+In general, \LLL evaluation methods need to be reproducible in order to measure improvements and changes over time. One straightforward way of doing this is to deploy a dialogue system and let humans interact with it. However, this is very time consuming and expensive, and alternatives with less or no humans in the loop are desired. 
+One major issue that is particular for evaluating dialogue systems is that they produce their "result" - the dialogue - during the interaction with their environment. Thus, any automated environment environment has to provide artificial users, and building them can be as complex as building the dialogue system itself. 
+
+When it comes to \LLL evaluation, additional complexity arises due to the fact that the interaction with the expert needs to be simulated as well. For instance, the dialogue system may ask an expert for advice about a new entity or topic. In general, the evaluation system cannot know in advance \emph{which} questions the dialogue system will ask - hence, it is hard to simulate. 
+
+\subsection*{Experimental Evaluation Environment} We are currently working on an experimental setting to automate the evaluation of knowledge acquisition and capability improvement. We work in the cooking domain, where the dialogue system is developed to assist the user by answering questions about cooking, e.g. providing recipes, giving advice or providing tutorials. Typical question might be "How do i prepare linguini, which is answered with a corresponding recipe from the database. 
+
+In order to evaluate the \LLL capabilities of the dialogue system, we deploy it in a simulated environment, which consists of: 
+\begin{itemize}
+    \item Evaluation agent: provides the questions and evaluates the answers given by the dialogue system. The agent institutes new situations by asking about entities which were not present in any training set of the dialogue system (e.g. enchilada), by asking types of questions which the dialogue system did not encounter yet (e.g. "How do i clean my oven?"), or by asking questions about unseen domains (e.g. Chinese food). 
+    \item Expert: provides advice to the dialogue system when stuck. The dialogue system can ask clarifying questions to the expert before it tries to answer the question of the evaluation agent. However, this comes at a cost, i.e. each interaction with the expert has its fee, and thus, the system should learn to efficiently interact with the expert. 
+    
+    We envision that the dialogue system asks questions from a list of predefined templates, which the (automated) expert can easily parse and answer. These are, for instance, "What is $<$X$>$?" or "Is $<$X$>$ a relevant entity for this question?". 
+    
+    The domain expert has at its hand a large collection of pre-recorded dialogues on the domain, and returns extracts of these dialogue that match to the clarification question.  
+\end{itemize}
+
+The evaluation measures the capability of the \LLL component to adapt to the new situations. This capability is measures by the number of interactions needed with the expert system before answering the initial question correctly. A system with a strong \LLL component should adapt to new situations quickly. 
+
+
+
+
+\section{Conclusion}
+Implementing lifelong learning for a dialogue system may aim at 1. extending the underlying knowledge base (Knowledge Induction); 2. handling more complex user interactions (Language Understanding); 3. improving the perceived quality of the resulting dialogues (Dialogue Behaviour); or 4. extending the functionality of the system (Capability Improvement) over time. 
+
+While stating these goals is simple, implementing a system that achieves any of these four goal is far from trivial. To the best of our knowledge, most approaches in research currently tackle the first dimension (Knowledge Induction), while there is almost no solution (yet) for the other three.
+
+One important challenge is to evaluation the progress of \LLL in such systems. In order to avoid time-consuming and costly human evaluations, automated environments are required. We are currently working on such a system, which shall be presented as shared task in 2020. 
+
+
+\section{Acknowledgements}
+This paper has been partially funded by the LIHLITH project, supported by ERA-NET CHIST-ERA and Swiss National Science Foundation (20CH21\_174237). 
+
+
+
+%\todo{for print version: make sure the styling of references complies with IWSDS style}
+
+\bibliographystyle{unsrt}
+\bibliography{lihlith_deliverables_format}
 
 \clearpage
 \addcontentsline{toc}{section}{References}
